@@ -1,0 +1,129 @@
+<div class="container text-center p-2">
+    <div *ngIf="modeTableDisplay">
+        <h1>Reservation List</h1>
+        <table class="table table-hover">
+            <thead>
+                <th>Id</th>
+                <th>Room Type</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Breakfast</th>
+                <th>Air Conditioner</th>
+                <th>Wake Up</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reservation of reservations">
+                    <td>{{reservation["_id"]}}</td>
+                    <td>{{reservation["room_type"]}}</td>
+                    <td>{{(reservation["from_date"]) | date }}</td>
+                    <td>{{(reservation["to_date"]) | date}}</td>
+                    <td [ngClass]="{'fw-bold text-success' : reservation['breakfast']}">
+                        {{reservation["breakfast"] ? 'Yes': 'No'}}
+                    </td>
+                    <td [ngClass]="{'fw-bold text-success' : reservation['air_conditioner']}">
+                        {{reservation["air_conditioner"] ? 'Yes': 'No'}}</td>
+                    <td [ngClass]="{'fw-bold text-success' : reservation['wake_up_service']}">
+                        {{reservation["wake_up_service"] ? 'Yes': 'No'}}</td>
+                    <td><button (click)="onModify(reservation['_id'])" mat-raised-button color="primary">Modify</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="modeEdit">
+        <h1>Modify Your Booking</h1>
+        <form [formGroup]="bookingForm">
+            <mat-form-field appearance="fill">
+                <mat-label>Room Type</mat-label>
+                <mat-select formControlName="roomType" placeholder="Room Type" required>
+                    <mat-option value="Single">Single</mat-option>
+                    <mat-option value="Double">Double</mat-option>
+                    <mat-option value="Triple">Triple</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill">
+                <mat-label>From Date</mat-label>
+                <!-- #docregion toggle -->
+                <input matInput [min]="minFromDate" [max]="maxDate" [matDatepicker]="fromPicker"
+                    formControlName="fromDate">
+                <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+                <mat-datepicker #fromPicker></mat-datepicker>
+                <!-- #enddocregion toggle -->
+            </mat-form-field>
+            <mat-form-field appearance="fill" (mouseenter)="onDateUpdate()">
+                <mat-label>To Date</mat-label>
+                <!-- #docregion toggle -->
+                <input matInput [min]="minToDate" [max]="maxDate" [matDatepicker]="toPicker" formControlName="toDate">
+                <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPicker></mat-datepicker>
+                <!-- #enddocregion toggle -->
+            </mat-form-field>
+            <br>
+            <div>
+                <mat-label>Breakfast: </mat-label>
+                <mat-radio-group formControlName="breakfast">
+                    <mat-radio-button [value]="true">Yes</mat-radio-button>
+                    <mat-radio-button [value]="false">No</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <br>
+            <p>
+                <mat-checkbox formControlName="airConditioner">Air Conditioner</mat-checkbox>
+                <mat-checkbox formControlName="wakeUpService">Wake Up Service</mat-checkbox>
+            </p>
+            <br>
+            <div>
+                <button mat-raised-button color="primary" (click)="onUpdate()">Update</button>
+                <button mat-raised-button color="warn" (click)="onDelete()">Delete</button>
+            </div>
+        </form>
+    </div>
+    <div *ngIf="reservationUpdated" class="mb-2">
+        <mat-accordion class="p-1 m-1">
+            <mat-expansion-panel class="alert alert-warning text-start py-0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Reservation Modified
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        Reservation Id {{bookingId}}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                Reservation Details : <br> <b>{{reservation.room_type}} Room</b> from
+                <b>{{(reservation.from_date).toDateString()}}</b> to
+                <b>{{reservation.to_date.toDateString()}}</b> <br> With :<ul>
+                    <li> Breakfast</li>
+                    <li *ngIf="reservation.air_conditioner"> Air Conditioner</li>
+                    <li *ngIf="reservation.wake_up_service"> Wake
+                        Up Service</li>
+                </ul>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+    <div *ngIf="reservationDeleted" class="mb-2">
+        <mat-accordion>
+            <mat-expansion-panel class="alert alert-danger text-start py-0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Reservation Deleted
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        Reservation Id {{bookingId}}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                Reservation {{bookingId}} for <br>{{reservation.room_type}} Room from
+                {{(reservation.from_date).toDateString()}} to
+                {{reservation.to_date.toDateString()}} <br> With :<ul class="mb-0">
+                    <li> Breakfast</li>
+                    <li *ngIf="reservation.air_conditioner"> Air Conditioner</li>
+                    <li *ngIf="reservation.wake_up_service"> Wake
+                        Up Service</li>
+                </ul>
+                has been deleted.
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

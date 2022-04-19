@@ -1,0 +1,10 @@
+.container .mat-radio-button {
+    margin: 0 12px;
+    font-size: larger;
+  }
+  mat-form-field, mat-checkbox, button{
+    margin: 4px;
+  }
+  .alert{
+    margin-top: 1rem;
+  }
