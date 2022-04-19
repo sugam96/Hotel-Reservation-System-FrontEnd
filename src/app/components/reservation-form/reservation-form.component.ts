@@ -27,6 +27,7 @@ export class ReservationFormComponent implements OnInit {
   bookingId: string;
   modeCreate = true;
   modeEdit = false;
+  errorMessage = "";
   reservation = {
     room_type: "",
     from_date: new Date,
@@ -38,7 +39,7 @@ export class ReservationFormComponent implements OnInit {
   constructor(private reservationService: ReservationService) {
   }
 
- 
+
   ngOnInit(): void {
     this.bookingForm = new FormGroup({
       roomType: this.roomType,
@@ -69,27 +70,37 @@ export class ReservationFormComponent implements OnInit {
     }
   }
   onSubmit() {
+    this.errorMessage = "";
     this.reservationCreated = false;
     this.reservationDeleted = false;
     this.reservationUpdated = false;
-    if (this.bookingForm.valid) {
-      this.reservation = {
-        room_type: this.roomType.value,
-        from_date: this.fromDate.value,
-        to_date: this.toDate.value,
-        breakfast: this.breakfast.value,
-        air_conditioner: this.airConditioner.value,
-        wake_up_service: this.wakeUpService.value
-      }
-      console.log("Creating");
-      this.reservationService.createReservation(this.reservation).subscribe((response: any) => {
-        if (response.status) {
-          this.bookingId = response.data["_id"];
-          this.reservationCreated = true;
+    if (!!(this.toDate.value) && !!(this.fromDate.value)) {
+      if(this.toDate.value>this.fromDate.value){
+        this.reservation = {
+          room_type: this.roomType.value,
+          from_date: this.fromDate.value,
+          to_date: this.toDate.value,
+          breakfast: this.breakfast.value,
+          air_conditioner: this.airConditioner.value,
+          wake_up_service: this.wakeUpService.value
         }
-      });
-      this.resetForm();
+        console.log("Creating");
+        this.reservationService.createReservation(this.reservation).subscribe((response: any) => {
+          if (response.status) {
+            this.bookingId = response.data["_id"];
+            this.reservationCreated = true;
+          }
+        });
+        this.resetForm();
+      }
+      else{
+        this.errorMessage = "To Date should be greater than From Date";
+      }
     }
+    else{
+      this.errorMessage = "Invalid Dates";
+    }
+
   }
   onEdit() {
     console.log("Edititng now");
@@ -139,7 +150,7 @@ export class ReservationFormComponent implements OnInit {
         this.reservationUpdated = false;
       }
     });
-    
+
     this.resetForm();
     this.modeCreate = true;
     this.modeEdit = false;
